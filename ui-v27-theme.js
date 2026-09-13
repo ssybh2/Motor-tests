@@ -36,13 +36,13 @@
     return data.map((trace, index) => {
       const next = { ...trace };
       if (residual) {
-        next.marker = { ...(trace.marker || {}), color: '#0ea5e9', line: { color: '#0369a1', width: .6 } };
+        next.marker = { ...(trace.marker || {}), color: '#22b7c4', line: { color: '#126f78', width: .6 } };
         return next;
       }
       if (index === 0) {
-        next.marker = { ...(trace.marker || {}), color: '#06b6d4', line: { color: '#0e7490', width: .55 } };
+        next.marker = { ...(trace.marker || {}), color: '#55ddea', line: { color: '#168d9a', width: .55 } };
       } else if (index === 1) {
-        next.line = { ...(trace.line || {}), color: '#7c3aed', width: Math.max(3, Number(trace.line?.width) || 3) };
+        next.line = { ...(trace.line || {}), color: '#d79a3c', width: Math.max(3, Number(trace.line?.width) || 3) };
       }
       return next;
     });
@@ -60,15 +60,15 @@
       ...base,
       margin: { ...(base.margin || {}), l: 78 * s, r: 26 * s, t: 98 * s, b: 72 * s },
       paper_bgcolor: '#ffffff',
-      plot_bgcolor: '#fbfdff',
-      font: { ...(base.font || {}), family: 'Inter, system-ui, sans-serif', size: 12 * s, color: '#26344d' },
+      plot_bgcolor: '#fbfdfd',
+      font: { ...(base.font || {}), family: 'Inter, system-ui, sans-serif', size: 12 * s, color: '#26343a' },
       title: {
         ...title,
         x: .02,
         y: .985,
         xanchor: 'left',
         yanchor: 'top',
-        font: { ...(title.font || {}), size: 15 * s, color: '#13213a' }
+        font: { ...(title.font || {}), size: 15 * s, color: '#142128' }
       },
       legend: {
         ...(base.legend || {}),
@@ -77,25 +77,25 @@
         y: 1.135,
         xanchor: 'left',
         yanchor: 'bottom',
-        bgcolor: 'rgba(255,255,255,.86)',
+        bgcolor: 'rgba(255,255,255,.88)',
         borderwidth: 0,
-        font: { ...(base.legend?.font || {}), size: 11.5 * s, color: '#42526b' }
+        font: { ...(base.legend?.font || {}), size: 11.5 * s, color: '#48575e' }
       },
       xaxis: {
         ...xaxis,
         automargin: true,
-        gridcolor: '#e9eef6',
-        zerolinecolor: '#cbd5e1',
-        tickfont: { ...(xaxis.tickfont || {}), size: 11 * s, color: '#34445f' },
-        title: { ...titleObject(xaxis.title, 13.5 * s), standoff: 18 * s, font: { ...titleObject(xaxis.title, 13.5 * s).font, color: '#26344d' } }
+        gridcolor: '#e7edef',
+        zerolinecolor: '#cbd5d8',
+        tickfont: { ...(xaxis.tickfont || {}), size: 11 * s, color: '#3f4e55' },
+        title: { ...titleObject(xaxis.title, 13.5 * s), standoff: 18 * s, font: { ...titleObject(xaxis.title, 13.5 * s).font, color: '#26343a' } }
       },
       yaxis: {
         ...yaxis,
         automargin: true,
-        gridcolor: '#e9eef6',
-        zerolinecolor: residual ? '#94a3b8' : '#cbd5e1',
-        tickfont: { ...(yaxis.tickfont || {}), size: 11 * s, color: '#34445f' },
-        title: { ...titleObject(yaxis.title, 13.5 * s), standoff: 20 * s, font: { ...titleObject(yaxis.title, 13.5 * s).font, color: '#26344d' } }
+        gridcolor: '#e7edef',
+        zerolinecolor: residual ? '#91a3aa' : '#cbd5d8',
+        tickfont: { ...(yaxis.tickfont || {}), size: 11 * s, color: '#3f4e55' },
+        title: { ...titleObject(yaxis.title, 13.5 * s), standoff: 20 * s, font: { ...titleObject(yaxis.title, 13.5 * s).font, color: '#26343a' } }
       }
     };
   }
