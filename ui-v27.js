@@ -1,6 +1,33 @@
 (() => {
   'use strict';
 
+  const root = document.documentElement;
+  let uiScale = 1;
+
+  /*
+   * Edge/Chrome can remember a very small per-site zoom (the user's screenshots are
+   * consistent with roughly 25%). Do NOT zoom or resize the whole app. Instead we
+   * keep the workspace viewport-wide and only compensate UI dimensions through a
+   * CSS variable. This avoids the left-column squeeze caused by older attempts.
+   */
+  function updateBrowserUiScale() {
+    try {
+      const inner = Number(window.innerWidth) || 0;
+      const outer = Number(window.outerWidth) || 0;
+      const screenWidth = Number(window.screen?.availWidth || window.screen?.width) || 0;
+      const candidates = [outer, screenWidth].filter(v => v > 320);
+      const reference = candidates.length ? Math.min(...candidates) : inner;
+      const ratio = reference > 0 ? inner / reference : 1;
+      uiScale = ratio > 1.22 ? Math.min(4, Math.max(1, ratio)) : 1;
+      root.style.setProperty('--v27-ui-scale', uiScale.toFixed(4));
+      root.classList.toggle('v27-site-zoom-compensated', uiScale > 1.05);
+      window.setTimeout(resizeInlinePlots, 20);
+    } catch (_) {
+      uiScale = 1;
+      root.style.setProperty('--v27-ui-scale', '1');
+    }
+  }
+
   function normalizeMath(tex) {
     let out = String(tex ?? '');
     out = out.replace(/\\,\s*/g, '\\cdot ');
@@ -179,26 +206,21 @@
 
     const shell = document.createElement('div');
     shell.className = 'axis-select-v27';
-
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'axis-select-button-v27';
     button.setAttribute('aria-haspopup', 'listbox');
     button.setAttribute('aria-expanded', 'false');
-
     const panel = document.createElement('div');
     panel.className = 'axis-select-panel-v27';
-
     const search = document.createElement('input');
     search.type = 'search';
     search.className = 'axis-select-search-v27';
     search.placeholder = '搜索数据列…';
     search.autocomplete = 'off';
-
     const options = document.createElement('div');
     options.className = 'axis-select-options-v27';
     options.setAttribute('role', 'listbox');
-
     panel.append(search, options);
     shell.append(button, panel);
     select.insertAdjacentElement('afterend', shell);
@@ -249,7 +271,6 @@
         setTimeout(() => search.focus(), 0);
       }
     });
-
     search.addEventListener('input', () => rebuild(search.value));
     search.addEventListener('keydown', (event) => {
       if (event.key === 'Escape') {
@@ -268,12 +289,91 @@
     card.querySelectorAll?.('.axis-select-v27').forEach((shell) => shell.__syncAxisSelect?.());
   }
 
+  function ensureResultPane(card) {
+    if (!(card instanceof HTMLElement)) return null;
+    let pane = card.querySelector(':scope > .job-result-pane-v27');
+    if (pane) return pane;
+    pane = document.createElement('section');
+    pane.className = 'job-result-pane-v27';
+    pane.dataset.jobId = card.dataset.jobId || '';
+    pane.innerHTML = '<div class="job-result-placeholder-v27"><div><strong>拟合结果将在这里显示</strong><span>配置左侧任务后点击“运行此任务”，右侧会直接生成拟合函数、指标、曲线与残差图。</span></div></div>';
+    card.appendChild(pane);
+    return pane;
+  }
+
+  function escapeSelector(value) {
+    if (window.CSS?.escape) return CSS.escape(String(value));
+    return String(value).replace(/["\\]/g, '\\$&');
+  }
+
+  function resultJobId(resultCard) {
+    const formula = resultCard.querySelector('.result-formula[id^="formula-"]');
+    if (formula?.id) return formula.id.slice('formula-'.length);
+    return '';
+  }
+
+  function findJobForResult(resultCard, fallbackIndex = -1) {
+    const id = resultJobId(resultCard);
+    if (id) {
+      const exact = document.querySelector(`.job-card[data-job-id="${escapeSelector(id)}"]`);
+      if (exact) return exact;
+    }
+    const errorName = resultCard.querySelector('.result-error strong')?.textContent?.trim();
+    if (errorName) {
+      const byName = Array.from(document.querySelectorAll('.job-card')).find(card => card.querySelector('.job-name')?.value?.trim() === errorName);
+      if (byName) return byName;
+    }
+    const jobs = Array.from(document.querySelectorAll('.job-card'));
+    return fallbackIndex >= 0 ? jobs[fallbackIndex] || null : null;
+  }
+
+  function scalePlot(plot) {
+    if (!plot || !window.Plotly?.Plots) return;
+    try {
+      window.Plotly.Plots.resize(plot);
+      if (window.Plotly.relayout) {
+        const s = uiScale || 1;
+        window.Plotly.relayout(plot, {
+          'font.size': 12 * s,
+          'title.font.size': 14 * s,
+          'legend.font.size': 11 * s,
+          'margin.l': 68 * s,
+          'margin.r': 22 * s,
+          'margin.t': 45 * s,
+          'margin.b': 62 * s
+        });
+      }
+    } catch (_) {}
+  }
+
+  function resizeInlinePlots() {
+    document.querySelectorAll('.job-result-pane-v27 .plot').forEach(scalePlot);
+  }
+
+  function redistributeResults() {
+    const host = document.getElementById('results');
+    if (!host) return;
+    const cards = Array.from(host.querySelectorAll(':scope > .result-card'));
+    if (!cards.length) return;
+    cards.forEach((resultCard, index) => {
+      const job = findJobForResult(resultCard, index);
+      if (!job) return;
+      const pane = ensureResultPane(job);
+      resultCard.classList.add('inline-result-card-v27');
+      pane.replaceChildren(resultCard);
+      window.setTimeout(() => {
+        resultCard.querySelectorAll('.plot').forEach(scalePlot);
+      }, 0);
+    });
+  }
+
   function enhanceCard(card) {
     if (!(card instanceof HTMLElement)) return;
     enhanceModelTools(card);
     card.querySelectorAll('.term-row').forEach((row) => enhanceTermRow(row, card));
     refreshPowerBadges(card);
     refreshAxisPickers(card);
+    ensureResultPane(card);
   }
 
   function enhanceAll(rootNode = document) {
@@ -282,7 +382,9 @@
 
   function init() {
     document.title = 'UAV Propulsion Fit Lab · UI v2.7';
+    updateBrowserUiScale();
     enhanceAll();
+    redistributeResults();
 
     document.addEventListener('click', (event) => {
       if (!event.target.closest('.axis-select-v27')) closeAxisPickers();
@@ -296,19 +398,26 @@
     });
 
     const observer = new MutationObserver((mutations) => {
+      let resultMutation = false;
       for (const mutation of mutations) {
+        if (mutation.target?.id === 'results') resultMutation = true;
         for (const node of mutation.addedNodes) {
           if (!(node instanceof Element)) continue;
           if (node.matches?.('.job-card')) enhanceCard(node);
           const card = node.closest?.('.job-card');
           if (node.matches?.('.term-row') && card) enhanceTermRow(node, card);
+          if (node.matches?.('.result-card') || node.querySelector?.('.result-card')) resultMutation = true;
           enhanceAll(node);
         }
       }
+      if (resultMutation) redistributeResults();
     });
     observer.observe(document.body, { childList: true, subtree: true });
+
+    window.addEventListener('resize', updateBrowserUiScale, { passive: true });
   }
 
+  updateBrowserUiScale();
   patchKatex();
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init, { once: true });
   else init();
