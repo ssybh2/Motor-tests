@@ -28,6 +28,7 @@ jobs:
           node --check app-v2.js
           node --check ui-v27.js
           node --check ui-v27-polish.js
+          node --check ui-v27-theme.js
       - name: Configure Pages
         uses: actions/configure-pages@v6
       - name: Upload Pages artifact
