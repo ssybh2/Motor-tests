@@ -1,0 +1,88 @@
+/* UI v2.4 — stable desktop/mobile layout + scoped browser-zoom normalization */
+#appRoot{width:100%;min-width:0;max-width:100%;}
+html.site-zoom-compensated body{overflow-x:hidden;}
+html.site-zoom-compensated #appRoot{
+  width:var(--site-width,100%);
+  zoom:var(--site-scale,1);
+}
+
+/* Keep the visible application centered at every normal desktop width. */
+.hero__inner,.shell,.footer{
+  width:min(1120px,calc(100% - 40px))!important;
+  max-width:1120px!important;
+  margin-left:auto!important;
+  margin-right:auto!important;
+}
+.shell{margin-top:-38px!important;}
+
+/* Nothing inside a card may widen the whole page. */
+.panel,.job-card,.job-context,.axis-pair,.axis-card,.model-card,.term-list,.term-row,.range-row,.runbar,.report-meta,.results,.result-card,.charts{min-width:0!important;max-width:100%!important;}
+.panel,.job-card,.model-card,.result-card{overflow:hidden;}
+
+/* Wide uploaded data scrolls locally only. */
+.table-wrap{width:100%;max-width:100%;overflow:auto!important;overscroll-behavior-x:contain;}
+.table-wrap table{width:max-content;min-width:100%;max-width:none;}
+
+/* Formula display: make multiplication dots obvious and formulas readable. */
+.formula-preview,.result-formula{font-size:24px!important;line-height:1.35;overflow-x:auto!important;overflow-y:hidden;}
+.formula-preview .katex,.result-formula .katex{font-size:1em;}
+.formula-preview .katex-display,.result-formula .katex-display{margin:0!important;min-width:max-content;}
+
+/* Coefficient editor: raw text is editable, math is rendered separately. */
+.coeff-editor-v24{display:grid;grid-template-columns:108px minmax(0,1fr);gap:10px;align-items:center;}
+.coeff-render-v24{height:44px;display:flex;align-items:center;justify-content:center;border:1px solid #d7e0ea;border-radius:10px;background:#f8fafc;font-size:20px;overflow:hidden;}
+.coeff-render-v24 .katex{font-size:1.08em;}
+.coeff-input-v24{min-width:0;}
+.coeff-input-v24 input{font-family:ui-monospace,SFMono-Regular,Consolas,monospace!important;font-size:15px!important;}
+.coeff-help-v24{grid-column:1/-1;color:#7b8796;font-size:11px;line-height:1.35;margin-top:-2px;}
+
+/* Desktop controls stay readable without making the whole page oversized. */
+.field>span{font-size:12.5px!important;}
+.field input,.field select,input.job-name{min-height:44px!important;height:44px!important;font-size:15px!important;}
+.field select option{font-size:15px!important;}
+.job-context,.axis-pair{grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;}
+.axis-fields{grid-template-columns:minmax(0,1.3fr) minmax(110px,.8fr) minmax(90px,.65fr)!important;}
+.term-row{grid-template-columns:82px minmax(200px,1.15fr) minmax(140px,.8fr) 105px 38px!important;gap:10px!important;}
+.term-row>*{min-width:0!important;}
+.term-unit{grid-column:2/5!important;white-space:normal!important;overflow-wrap:anywhere;}
+.range-row{grid-template-columns:minmax(0,1fr) 145px 145px!important;}
+
+@media(max-width:900px){
+  .hero__inner,.shell,.footer{width:min(760px,calc(100% - 24px))!important;}
+  .job-context,.axis-pair{grid-template-columns:1fr!important;}
+  .term-row{grid-template-columns:76px minmax(0,1fr) 100px 38px!important;}
+  .term-core{grid-column:2/4;grid-row:2;}
+  .term-unit{grid-column:2/4!important;}
+  .range-row{grid-template-columns:1fr 1fr!important;}
+  .range-label{grid-column:1/-1;}
+  .runbar{flex-direction:column;align-items:stretch;}
+  .report-meta{width:100%;}
+}
+
+@media(max-width:640px){
+  .hero__inner,.shell,.footer{width:calc(100% - 18px)!important;}
+  .hero{padding:26px 12px 58px!important;}
+  .panel{padding:16px!important;border-radius:15px;}
+  .section-heading--actions{flex-direction:column;align-items:stretch;}
+  .data-toolbar{flex-direction:column;align-items:stretch;}
+  .summary-chip{white-space:normal;}
+  .axis-fields{grid-template-columns:1fr 1fr!important;}
+  .axis-fields .field:first-child{grid-column:1/-1;}
+  .formula-preview,.result-formula{font-size:19px!important;}
+  .term-row{display:grid!important;grid-template-columns:72px minmax(0,1fr) 38px!important;padding:12px!important;}
+  .term-toggle-wrap{grid-column:1;}
+  .term-row>.field:has(.term-coeff){grid-column:2;}
+  .delete-term{grid-column:3;grid-row:1;}
+  .term-core{grid-column:1/-1!important;grid-row:auto!important;}
+  .term-row>.field:has(.term-power){grid-column:1/-1;}
+  .term-unit{grid-column:1/-1!important;}
+  .coeff-editor-v24{grid-template-columns:92px minmax(0,1fr);}
+  .range-row{grid-template-columns:1fr 1fr!important;}
+  .report-meta{flex-direction:column;align-items:stretch;}
+  .report-meta>.field:first-child{width:100%!important;min-width:0!important;}
+}
+
+@media(max-width:390px){
+  .axis-fields,.range-row{grid-template-columns:1fr!important;}
+  .axis-fields .field,.range-label{grid-column:auto!important;}
+}
