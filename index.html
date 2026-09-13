@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="UAV propulsion-system test-data fitting workbench" />
+  <title>UAV Propulsion Fit Lab</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
+</head>
+<body>
+  <header class="hero">
+    <div class="hero__inner">
+      <div>
+        <div class="eyebrow">MOTOR TESTS / BROWSER-ONLY ANALYSIS</div>
+        <h1>UAV Propulsion Fit Lab</h1>
+        <p class="hero__lead">上传测试压缩包，选择变量与幂次，批量完成动力系统拟合、诊断与 PDF 报告生成。</p>
+      </div>
+      <div class="privacy-badge" title="数据仅在浏览器本地处理">
+        <span class="privacy-dot"></span>
+        Local processing · No server upload
+      </div>
+    </div>
+  </header>
+
+  <main class="shell">
+    <section class="panel" id="dataPanel">
+      <div class="section-heading">
+        <div>
+          <div class="step">01</div>
+          <h2>载入测试数据</h2>
+          <p>支持 ZIP、CSV、TSV、TXT。ZIP 会在浏览器内自动解压并发现表格文件。</p>
+        </div>
+      </div>
+
+      <label class="dropzone" id="dropzone" for="fileInput">
+        <input id="fileInput" type="file" accept=".zip,.csv,.tsv,.txt,text/csv,text/tab-separated-values" hidden />
+        <div class="dropzone__icon">↥</div>
+        <div class="dropzone__title">拖入测试包，或点击选择文件</div>
+        <div class="dropzone__hint">建议首行包含列名，例如 PWM, RPM, Thrust_N, Torque_Nm</div>
+      </label>
+
+      <div id="loadStatus" class="status muted">尚未载入数据。</div>
+
+      <div id="datasetArea" class="hidden">
+        <div class="toolbar data-toolbar">
+          <label class="field grow">
+            <span>预览数据集</span>
+            <select id="previewDatasetSelect"></select>
+          </label>
+          <div class="summary-chip" id="datasetSummary"></div>
+        </div>
+        <div class="table-wrap">
+          <table id="previewTable"></table>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" id="fitPanel">
+      <div class="section-heading section-heading--actions">
+        <div>
+          <div class="step">02</div>
+          <h2>定义拟合任务</h2>
+          <p>每个任务都可以单独选择数据文件、X/Y 列、常用动力模型或完全自定义幂次。</p>
+        </div>
+        <button class="btn btn-secondary" id="addJobBtn" disabled>＋ 添加拟合任务</button>
+      </div>
+
+      <div class="power-help">
+        <strong>幂次写法：</strong>
+        <code>2</code> → y = a·x²；
+        <code>1,2</code> → y = a·x + b·x²；
+        <code>0,1,2</code> → y = a₀ + a₁·x + a₂·x²。
+        也支持 <code>-1</code>、<code>0.5</code> 等实数幂（数据必须满足数学定义域）。
+      </div>
+
+      <div id="jobs" class="jobs empty-state">
+        <div>载入数据后即可创建拟合任务。</div>
+      </div>
+
+      <div class="runbar">
+        <div class="report-meta">
+          <label class="field">
+            <span>报告标题</span>
+            <input id="reportTitle" type="text" value="UAV Propulsion Fit Report" />
+          </label>
+          <label class="field grow">
+            <span>备注（可选）</span>
+            <input id="reportNotes" type="text" placeholder="Motor / propeller / ESC / test condition..." />
+          </label>
+        </div>
+        <button class="btn btn-primary" id="runAllBtn" disabled>运行全部拟合</button>
+      </div>
+    </section>
+
+    <section class="panel" id="resultsPanel">
+      <div class="section-heading section-heading--actions">
+        <div>
+          <div class="step">03</div>
+          <h2>拟合结果</h2>
+          <p>查看函数、误差指标、系数、拟合曲线和残差；结果可直接导出。</p>
+        </div>
+        <div class="button-row">
+          <button class="btn btn-secondary" id="exportJsonBtn" disabled>导出 JSON</button>
+          <button class="btn btn-primary" id="exportPdfBtn" disabled>导出 PDF</button>
+        </div>
+      </div>
+
+      <div id="resultStatus" class="status muted">还没有拟合结果。</div>
+      <div id="results" class="results"></div>
+    </section>
+
+    <section class="panel compact-panel">
+      <details>
+        <summary>模型说明与建议</summary>
+        <div class="details-body">
+          <p>该工具采用普通最小二乘（OLS）拟合用户选择的幂函数基。它既可以表达有物理约束的模型，例如 <code>T = kT·RPM²</code>，也可以表达带一次项和常数项的经验模型。</p>
+          <p>对于无人机动力系统，建议优先从物理合理的低阶模型开始，再根据残差、R²、RMSE 与实验机理决定是否增加额外项。高阶多项式虽然可能提高训练数据上的 R²，但更容易过拟合并产生不合理外推。</p>
+        </div>
+      </details>
+    </section>
+  </main>
+
+  <template id="jobTemplate">
+    <article class="job-card">
+      <div class="job-card__head">
+        <input class="job-name" type="text" aria-label="任务名称" />
+        <div class="button-row tight">
+          <button class="icon-btn duplicate-job" title="复制任务">⧉</button>
+          <button class="icon-btn remove-job" title="删除任务">×</button>
+        </div>
+      </div>
+
+      <div class="job-grid">
+        <label class="field span-2">
+          <span>数据集</span>
+          <select class="job-dataset"></select>
+        </label>
+        <label class="field span-2">
+          <span>常用模型</span>
+          <select class="job-preset"></select>
+        </label>
+        <label class="field">
+          <span>X 列</span>
+          <select class="job-x"></select>
+        </label>
+        <label class="field">
+          <span>Y 列</span>
+          <select class="job-y"></select>
+        </label>
+        <label class="field">
+          <span>幂次</span>
+          <input class="job-powers mono" type="text" value="0,1,2" />
+        </label>
+        <label class="field">
+          <span>X 轴显示名（可选）</span>
+          <input class="job-x-label" type="text" placeholder="默认使用列名" />
+        </label>
+        <label class="field">
+          <span>Y 轴显示名（可选）</span>
+          <input class="job-y-label" type="text" placeholder="默认使用列名" />
+        </label>
+        <label class="field">
+          <span>X 最小值（可选）</span>
+          <input class="job-min-x mono" type="number" step="any" placeholder="不限制" />
+        </label>
+        <label class="field">
+          <span>X 最大值（可选）</span>
+          <input class="job-max-x mono" type="number" step="any" placeholder="不限制" />
+        </label>
+      </div>
+      <div class="job-foot">
+        <span class="job-validity muted">等待配置</span>
+        <button class="btn btn-small run-one">运行此任务</button>
+      </div>
+    </article>
+  </template>
+
+  <footer class="footer">
+    <span>Motor-tests · UAV Propulsion Fit Lab</span>
+    <span>Static GitHub Pages application</span>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
