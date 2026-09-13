@@ -3,12 +3,14 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="Browser-only UAV propulsion-system test-data fitting workbench" />
+  <meta name="description" content="Browser-only UAV propulsion-system fitting workbench" />
   <title>UAV Propulsion Fit Lab</title>
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
+  <link rel="stylesheet" href="styles-v2.css" />
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
 </head>
@@ -16,64 +18,119 @@
   <header class="hero">
     <div class="hero__inner">
       <div>
-        <div class="eyebrow">MOTOR TESTS / BROWSER-ONLY ANALYSIS</div>
+        <div class="eyebrow">MOTOR TESTS · PROPULSION IDENTIFICATION</div>
         <h1>UAV Propulsion Fit Lab</h1>
-        <p class="hero__lead">上传测试包，自定义变量与幂次，批量拟合无人机动力系统并导出 PDF。</p>
+        <p class="hero__lead">上传测试包，直观定义横纵轴、单位与模型项，批量拟合并导出报告。</p>
       </div>
-      <div class="privacy-badge" title="数据仅在浏览器本地处理"><span class="privacy-dot"></span>Local processing · No server upload</div>
+      <div class="privacy-badge"><span class="privacy-dot"></span>Local processing</div>
     </div>
   </header>
 
   <main class="shell">
     <section class="panel" id="dataPanel">
-      <div class="section-heading"><div><div class="step">01</div><h2>载入测试数据 / Load data</h2><p>支持 ZIP、DET 测试台文本型 XLS、CSV、TSV、TXT。ZIP 自动解压并识别表格。</p></div></div>
+      <div class="section-heading">
+        <div class="step">01</div>
+        <div><h2>载入数据 <span>/ Load data</span></h2><p>ZIP、DET 文本型 XLS、CSV、TSV、TXT。数据仅在浏览器本地处理。</p></div>
+      </div>
       <label class="dropzone" id="dropzone" for="fileInput">
         <input id="fileInput" type="file" accept=".zip,.xls,.csv,.tsv,.txt,text/csv,text/tab-separated-values" hidden />
-        <div class="dropzone__icon">↥</div>
+        <div class="dropzone__icon">↑</div>
         <div class="dropzone__title">拖入测试包，或点击选择文件</div>
-        <div class="dropzone__hint">可直接使用 DET 测试台导出的 ZIP / .xls，无需先转 CSV</div>
+        <div class="dropzone__hint">可直接使用 DET 测试台导出的 ZIP / .xls，无需预先转换</div>
       </label>
       <div id="loadStatus" class="status muted">尚未载入数据。</div>
       <div id="datasetArea" class="hidden">
-        <div class="toolbar data-toolbar"><label class="field grow"><span>预览数据集 / Dataset</span><select id="previewDatasetSelect"></select></label><div class="summary-chip" id="datasetSummary"></div></div>
+        <div class="data-toolbar">
+          <label class="field grow"><span>数据预览 / Dataset</span><select id="previewDatasetSelect"></select></label>
+          <div class="summary-chip" id="datasetSummary"></div>
+        </div>
         <div class="table-wrap"><table id="previewTable"></table></div>
       </div>
     </section>
 
     <section class="panel" id="fitPanel">
-      <div class="section-heading section-heading--actions"><div><div class="step">02</div><h2>定义拟合任务 / Configure fits</h2><p>选择数据集、X/Y 列、常用模型，或直接指定任意幂函数基。</p></div><button class="btn btn-secondary" id="addJobBtn" disabled>＋ 添加拟合任务</button></div>
-      <div class="power-help"><strong>幂次 / Powers：</strong><code>2</code> → y=a·x²； <code>1,2</code> → y=a·x+b·x²； <code>0,1,2</code> → y=a₀+a₁x+a₂x²。支持负幂和小数幂。</div>
+      <div class="section-heading section-heading--actions">
+        <div class="heading-copy"><div class="step">02</div><div><h2>定义拟合任务 <span>/ Configure fits</span></h2><p>每个任务都是一条明确的 “Y vs X” 曲线；单位与模型项都可独立设置。</p></div></div>
+        <button class="btn btn-secondary" id="addJobBtn" disabled>＋ 添加任务</button>
+      </div>
       <div id="jobs" class="jobs empty-state"><div>载入数据后即可创建拟合任务。</div></div>
-      <div class="runbar"><div class="report-meta"><label class="field"><span>报告标题 / Report title</span><input id="reportTitle" type="text" value="UAV Propulsion Fit Report" /></label><label class="field grow"><span>备注 / Notes</span><input id="reportNotes" type="text" placeholder="Motor / propeller / ESC / test condition..." /></label></div><button class="btn btn-primary" id="runAllBtn" disabled>运行全部拟合</button></div>
+      <div class="runbar">
+        <div class="report-meta">
+          <label class="field"><span>报告标题 / Report title</span><input id="reportTitle" value="UAV Propulsion Fit Report" /></label>
+          <label class="field grow"><span>备注 / Notes</span><input id="reportNotes" placeholder="Motor / propeller / ESC / test condition..." /></label>
+        </div>
+        <button class="btn btn-primary" id="runAllBtn" disabled>运行全部拟合</button>
+      </div>
     </section>
 
     <section class="panel" id="resultsPanel">
-      <div class="section-heading section-heading--actions"><div><div class="step">03</div><h2>拟合结果 / Results</h2><p>函数、系数、R²、RMSE、MAE、拟合曲线与残差图。</p></div><div class="button-row"><button class="btn btn-secondary" id="exportJsonBtn" disabled>导出 JSON</button><button class="btn btn-primary" id="exportPdfBtn" disabled>导出 PDF</button></div></div>
-      <div id="resultStatus" class="status muted">还没有拟合结果。</div><div id="results" class="results"></div>
+      <div class="section-heading section-heading--actions">
+        <div class="heading-copy"><div class="step">03</div><div><h2>拟合结果 <span>/ Results</span></h2><p>公式、系数与单位、误差指标、拟合曲线和残差。</p></div></div>
+        <div class="button-row"><button class="btn btn-secondary" id="exportJsonBtn" disabled>导出 JSON</button><button class="btn btn-primary" id="exportPdfBtn" disabled>导出 PDF</button></div>
+      </div>
+      <div id="resultStatus" class="status muted">还没有拟合结果。</div>
+      <div id="results" class="results"></div>
     </section>
-
-    <section class="panel compact-panel"><details><summary>数据格式与模型说明 / Notes</summary><div class="details-body"><p>已针对 DET 测试台文件适配：可识别 GBK/GB18030 编码、13 行元数据表头以及无表头续写片段，并自动生成 <code>omega(rad/s)</code> 与 <code>F(N)</code> 派生列。</p><p>建议从有物理意义的低阶模型开始，例如 <code>T=k·RPM²</code>，再根据残差和误差指标增加一次项或常数项。</p></div></details></section>
   </main>
 
   <template id="jobTemplate">
     <article class="job-card">
-      <div class="job-card__head"><input class="job-name" type="text" aria-label="任务名称" /><div class="button-row tight"><button class="icon-btn duplicate-job" title="复制任务">⧉</button><button class="icon-btn remove-job" title="删除任务">×</button></div></div>
-      <div class="job-grid">
-        <label class="field span-2"><span>数据集</span><select class="job-dataset"></select></label>
-        <label class="field span-2"><span>常用模型</span><select class="job-preset"></select></label>
-        <label class="field"><span>X 列</span><select class="job-x"></select></label>
-        <label class="field"><span>Y 列</span><select class="job-y"></select></label>
-        <label class="field"><span>幂次</span><input class="job-powers mono" type="text" value="0,1,2" /></label>
-        <label class="field"><span>X 轴显示名</span><input class="job-x-label" type="text" placeholder="默认使用列名" /></label>
-        <label class="field"><span>Y 轴显示名</span><input class="job-y-label" type="text" placeholder="默认使用列名" /></label>
-        <label class="field"><span>X 最小值</span><input class="job-min-x mono" type="number" step="any" placeholder="不限制" /></label>
-        <label class="field"><span>X 最大值</span><input class="job-max-x mono" type="number" step="any" placeholder="不限制" /></label>
+      <div class="job-head">
+        <div class="job-title-block">
+          <input class="job-name" aria-label="任务名称" />
+          <div class="job-direction">—</div>
+        </div>
+        <div class="button-row tight"><button class="icon-btn duplicate-job" title="复制任务">⧉</button><button class="icon-btn remove-job" title="删除任务">×</button></div>
       </div>
-      <div class="job-foot"><span class="job-validity muted">等待配置</span><button class="btn btn-small run-one">运行此任务</button></div>
+
+      <div class="job-context">
+        <label class="field"><span>数据集 / Dataset</span><select class="job-dataset"></select></label>
+        <label class="field"><span>模型模板 / Preset</span><select class="job-preset"></select></label>
+      </div>
+
+      <div class="axis-pair">
+        <section class="axis-card axis-x">
+          <div class="axis-card__head"><span class="axis-chip">X</span><strong>横轴 / Input</strong></div>
+          <label class="field"><span>数据列 / Source column</span><select class="job-x"></select></label>
+          <div class="axis-fields">
+            <label class="field"><span>轴名称 / Name</span><input class="job-x-name" placeholder="RPM" /></label>
+            <label class="field"><span>公式符号 / Symbol</span><input class="job-x-symbol" placeholder="RPM" /></label>
+            <label class="field axis-unit"><span>单位 / Unit</span><input class="job-x-unit" placeholder="rpm" /></label>
+          </div>
+          <div class="axis-preview job-x-preview">—</div>
+        </section>
+        <section class="axis-card axis-y">
+          <div class="axis-card__head"><span class="axis-chip">Y</span><strong>纵轴 / Output</strong></div>
+          <label class="field"><span>数据列 / Source column</span><select class="job-y"></select></label>
+          <div class="axis-fields">
+            <label class="field"><span>轴名称 / Name</span><input class="job-y-name" placeholder="Thrust" /></label>
+            <label class="field"><span>公式符号 / Symbol</span><input class="job-y-symbol" placeholder="T" /></label>
+            <label class="field axis-unit"><span>单位 / Unit</span><input class="job-y-unit" placeholder="N" /></label>
+          </div>
+          <div class="axis-preview job-y-preview">—</div>
+        </section>
+      </div>
+
+      <section class="model-card">
+        <div class="model-head">
+          <div><div class="model-kicker">MODEL</div><h4>拟合模型</h4></div>
+          <button class="btn btn-ghost btn-small add-term" type="button">＋ 添加一项</button>
+        </div>
+        <div class="formula-shell"><div class="formula-preview">—</div><div class="formula-note">关闭某一项 = 该项系数固定为 0，不参与拟合。</div></div>
+        <div class="term-list"></div>
+      </section>
+
+      <div class="range-row">
+        <div class="range-label"><strong>拟合范围 / Fit range</strong><span>可选；留空表示使用全部有效数据</span></div>
+        <label class="field"><span>X 最小值</span><input class="job-min-x" type="number" step="any" placeholder="不限制" /></label>
+        <label class="field"><span>X 最大值</span><input class="job-max-x" type="number" step="any" placeholder="不限制" /></label>
+      </div>
+
+      <div class="job-foot"><span class="job-validity muted">等待配置</span><button class="btn btn-secondary btn-small run-one">运行此任务</button></div>
     </article>
   </template>
 
-  <footer class="footer"><span>Motor-tests · UAV Propulsion Fit Lab</span><span>Static GitHub Pages application</span></footer>
-  <script src="app.js"></script>
+  <footer class="footer"><span>Motor-tests · UAV Propulsion Fit Lab</span><span>GitHub Pages · browser-only</span></footer>
+  <script src="app-v2.js"></script>
 </body>
 </html>
