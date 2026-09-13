@@ -20,15 +20,16 @@
 - 支持导出 PDF 和 JSON。
 - 数据只在当前浏览器本地处理，不上传到分析服务器。
 
-### UI v2.7
+### UI v2.7 桌面工作台
 
-v2.7 参考 `EcatV2_Master` 的在线 TaskEditor 设计语言重做桌面布局：
+v2.7 参考 `EcatV2_Master` 的在线 TaskEditor 设计语言，并针对 Windows / Edge 的实际使用继续优化：
 
-- 使用居中的 **1480 px 工程工作区**，避免内容挤在屏幕左侧。
-- 使用白色 sticky topbar、浅灰工程背景、统一 18 px 卡片、柔和阴影和清晰的 section hierarchy。
-- 增加 01 / 02 / 03 工作流导航，对应 Data / Configure Fits / Results。
-- X/Y 数据列使用可搜索的大字体下拉面板，适合字段较多的 DET 数据。
-- **彻底移除浏览器 zoom / scale 自动补偿逻辑**。网页现在完全依赖标准响应式 CSS，不再猜测 Windows/Edge 的缩放比例。
+- 工作区直接使用浏览器可见宽度，不再受固定 `1480px` 上限影响，因此即使 Edge 为该站点保存了较小的页面缩放，主工作区也不会缩成屏幕中央的一小块。
+- 不对整个网页使用 CSS `zoom` 或 `transform: scale()`。脚本只根据浏览器窗口与站点缩放的比例调整字体、控件高度、间距和图表字号，避免过去出现的“全部内容挤在左边”问题。
+- 每个拟合任务现在是一个 **左右分栏工作台**：左侧配置 Dataset / Preset / X / Y / 单位 / 模型项 / 拟合范围；点击“运行此任务”后，该任务自己的公式、误差指标、系数表、拟合曲线和残差图直接显示在右侧。
+- “运行全部拟合”会把每个结果分别放回对应任务的右侧，不再把所有图堆到页面最下面。
+- 页面底部 Results 区域现在主要用于显示运行状态以及导出 JSON / PDF。
+- X/Y 数据列继续使用可搜索的大字体下拉面板，适合字段较多的 DET 数据。
 
 ### 推荐桌面环境
 
@@ -36,10 +37,10 @@ v2.7 参考 `EcatV2_Master` 的在线 TaskEditor 设计语言重做桌面布局�
 - Microsoft Edge（推荐）
 - Google Chrome
 
-如果浏览器仍显示旧版本，请使用 `Ctrl + F5` 强制刷新缓存。
+如果浏览器仍显示旧缓存，请使用 `Ctrl + F5` 强制刷新。
 
 ## English
 
 Browser-only UAV propulsion fitting tool. Upload ZIP, DET text-based `.xls`, CSV, TSV, or TXT files; configure explicit X/Y axes, units, symbols, and selectable model terms; then export equations, metrics, plots, PDF, and JSON.
 
-The current UI is **v2.7**, using a centered TaskEditor-inspired engineering workspace and standard responsive CSS without browser zoom compensation. Uploaded test data is processed locally in the browser.
+The current **UI v2.7** uses a viewport-wide TaskEditor-inspired workspace. Each fit task has configuration on the left and its own equation, metrics, fit plot, and residual plot on the right after execution. The UI compensates very small Edge/Chrome per-site zoom by scaling interface dimensions only; it never zooms or transforms the whole application. Uploaded test data is processed locally in the browser.
