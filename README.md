@@ -2,7 +2,7 @@
 
 **在线工具 / Web app:** https://ssybh2.github.io/Motor-tests/
 
-当前在线界面：**UI v2.6**
+当前在线界面：**UI v2.7**
 
 ## 中文
 
@@ -20,16 +20,26 @@
 - 支持导出 PDF 和 JSON。
 - 数据只在当前浏览器本地处理，不上传到分析服务器。
 
+### UI v2.7
+
+v2.7 参考 `EcatV2_Master` 的在线 TaskEditor 设计语言重做桌面布局：
+
+- 使用居中的 **1480 px 工程工作区**，避免内容挤在屏幕左侧。
+- 使用白色 sticky topbar、浅灰工程背景、统一 18 px 卡片、柔和阴影和清晰的 section hierarchy。
+- 增加 01 / 02 / 03 工作流导航，对应 Data / Configure Fits / Results。
+- X/Y 数据列使用可搜索的大字体下拉面板，适合字段较多的 DET 数据。
+- **彻底移除浏览器 zoom / scale 自动补偿逻辑**。网页现在完全依赖标准响应式 CSS，不再猜测 Windows/Edge 的缩放比例。
+
 ### 推荐桌面环境
 
 - Windows 10 / Windows 11
 - Microsoft Edge（推荐）
 - Google Chrome
 
-UI v2.6 针对 Windows 桌面进行了重新适配，并对浏览器极端缩小的站点缩放进行自动补偿。X/Y 数据列使用可搜索的大字体下拉面板，便于 DET 数据字段较多时选择。
+如果浏览器仍显示旧版本，请使用 `Ctrl + F5` 强制刷新缓存。
 
 ## English
 
 Browser-only UAV propulsion fitting tool. Upload ZIP, DET text-based `.xls`, CSV, TSV, or TXT files; configure explicit X/Y axes, units, symbols, and selectable model terms; then export equations, metrics, plots, PDF, and JSON.
 
-The current UI is **v2.6**, optimized for Windows desktop browsers. Uploaded test data is processed locally in the browser.
+The current UI is **v2.7**, using a centered TaskEditor-inspired engineering workspace and standard responsive CSS without browser zoom compensation. Uploaded test data is processed locally in the browser.
