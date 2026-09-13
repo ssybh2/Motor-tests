@@ -3,6 +3,21 @@
 
   const CARD_FLAG = 'data-ui-v25';
 
+  function normalizeMath(tex) {
+    return String(tex ?? '')
+      .replace(/\\,\s*/g, '\\mathbin{\\cdot} ')
+      .replace(/(-?\d+(?:\.\d+)?)e([+-]?\d+)/gi, '$1\\times 10^{$2}');
+  }
+
+  function patchKatex() {
+    if (!window.katex || window.katex.__motorTestsV25Patched) return;
+    const render = window.katex.render.bind(window.katex);
+    const renderToString = window.katex.renderToString.bind(window.katex);
+    window.katex.render = (tex, element, options) => render(normalizeMath(tex), element, options);
+    window.katex.renderToString = (tex, options) => renderToString(normalizeMath(tex), options);
+    window.katex.__motorTestsV25Patched = true;
+  }
+
   function normalizeCoeff(value) {
     return String(value || '').trim().replace(/\s+/g, '');
   }
@@ -163,6 +178,7 @@
     document.title = 'UAV Propulsion Fit Lab · UI v2.5';
   }
 
+  patchKatex();
   markVersion();
   enhanceAll();
 
