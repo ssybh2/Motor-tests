@@ -1,80 +1,13 @@
-# Motor-tests — UAV Propulsion Fit Lab
+# Motor-tests · UAV Propulsion Fit Lab
 
-A browser-only fitting workbench for UAV propulsion-system test data.
+在线工具 / Web app: **https://ssybh2.github.io/Motor-tests/**
 
-## What it does
+## 中文
+浏览器本地运行的无人机动力系统拟合工具。支持直接上传 ZIP、DET 测试台文本型 `.xls`、CSV、TSV、TXT；可选择 RPM→推力、RPM→扭矩、PWM→RPM 等常见关系，也可自定义幂次，例如 `2`、`1,2`、`0,1,2`。输出拟合函数、R²、RMSE、残差图，并可导出 PDF/JSON。
 
-- Load `.zip`, `.csv`, `.tsv`, or `.txt` test data locally in the browser.
-- Automatically unpack ZIP archives and discover tabular files.
-- Select one table or merge all discovered tables.
-- Create multiple fitting jobs in one session.
-- Use common UAV propulsion presets such as RPM→Thrust, RPM→Torque, RPM→Power, PWM/Throttle→RPM, PWM/Throttle→Thrust, Current→Torque, RPM→Current, Voltage→RPM, J→CT, and J→CP.
-- Customize power-basis terms directly, e.g.:
-  - `2` → `y = a·x²`
-  - `1,2` → `y = a·x + b·x²`
-  - `0,1,2` → `y = a₀ + a₁·x + a₂·x²`
-  - arbitrary real powers such as `0,0.5,1,2,-1` are supported when mathematically valid for the input data.
-- Restrict the fitting range with optional X minimum/maximum values.
-- Inspect R², adjusted R², RMSE, MAE, maximum absolute error, fitted coefficients, fitting plots, and residual plots.
-- Export a concise PDF report with equations, metrics, coefficient tables, fitting plots, and residual plots.
-- Export machine-readable JSON results.
+数据只在浏览器本地处理，不上传到分析服务器。
 
-## Privacy
+## English
+Browser-only UAV propulsion fitting tool. Upload ZIP, DET text-based `.xls`, CSV, TSV, or TXT files; choose common fits such as RPM→Thrust, RPM→Torque, and PWM→RPM, or define custom powers such as `2`, `1,2`, or `0,1,2`. Export equations, fit metrics, plots, PDF, and JSON.
 
-All archive extraction, parsing, fitting, plotting, and report generation happens in your browser. Test data is not uploaded to a fitting server.
-
-## Run locally
-
-Because this is a static site, you can either open `index.html` directly or serve the repository folder with any static HTTP server.
-
-For example:
-
-```bash
-python -m http.server 8000
-```
-
-Then open `http://localhost:8000`.
-
-## Publish with GitHub Pages
-
-This repository is already structured as a static site at the repository root. No build step is required.
-
-In GitHub:
-
-1. Open **Settings → Pages**.
-2. Under **Build and deployment**, choose **Deploy from a branch**.
-3. Select branch **main** and folder **/(root)**.
-4. Save.
-
-After GitHub publishes it, the expected site URL is:
-
-`https://ssybh2.github.io/Motor-tests/`
-
-## Input data
-
-The app works best with a header row and numeric columns, for example:
-
-```csv
-PWM,RPM,Thrust_N,Torque_Nm,Voltage_V,Current_A
-1100,2200,0.31,0.012,24.8,2.1
-1200,3900,0.94,0.031,24.6,4.0
-1300,5600,1.88,0.058,24.3,7.2
-```
-
-Rows with missing/non-numeric values in the selected X or Y columns are skipped automatically. A small synthetic example is included at `sample_data/motor_test_example.csv` so the complete workflow can be tested immediately.
-
-## Fitting implementation
-
-Version 1 uses ordinary least squares over a user-selected real-valued power basis. The least-squares solver uses column scaling and QR orthogonalization instead of directly inverting the normal equations, which improves numerical behavior for large RPM values and correlated polynomial terms.
-
-The generalized model is:
-
-```text
-y = Σ a_k x^(p_k)
-```
-
-where every exponent `p_k` is selected by the user. This means physically constrained models such as `T = k_T·RPM²` and empirical models with linear/constant terms are handled by the same fitting engine.
-
-## Browser dependencies
-
-The static page loads JSZip, Papa Parse, Plotly, html2canvas, and jsPDF from public CDNs. An internet connection is therefore required when opening the hosted page.
+Uploaded test data is processed locally in the browser.
