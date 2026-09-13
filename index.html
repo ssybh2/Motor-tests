@@ -10,12 +10,12 @@
   <title>UAV Propulsion Fit Lab · UI v2.7</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" />
   <link rel="stylesheet" href="styles-v2.css?v=20260913-v27base" />
-  <link rel="stylesheet" href="ui-v27.css?v=20260913-v27" />
+  <link rel="stylesheet" href="ui-v27.css?v=20260913-v27-split2" />
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
-  <script src="ui-v27.js?v=20260913-v27"></script>
+  <script src="ui-v27.js?v=20260913-v27-split2"></script>
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
 </head>
@@ -25,7 +25,7 @@
       <div class="brand">
         <div class="eyebrow">MOTOR TESTS / PROPULSION IDENTIFICATION</div>
         <h1>UAV Propulsion Fit Lab</h1>
-        <p>测试数据载入、Y(X) 模型配置、公式拟合与报告导出。</p>
+        <p>左侧配置每条 Y(X) 拟合任务；运行后，公式、指标和图像直接显示在同一任务右侧。</p>
       </div>
       <div class="top-actions">
         <a class="top-link" href="https://github.com/ssybh2/Motor-tests" target="_blank" rel="noreferrer">GitHub</a>
@@ -40,11 +40,11 @@
         </a>
         <a class="workflow-tab" href="#fitPanel">
           <span class="workflow-index">02</span>
-          <span><strong>Configure Fits</strong><small>定义 X / Y、单位、符号和模型项</small></span>
+          <span><strong>Configure + Fit</strong><small>左侧定义模型，右侧查看该任务拟合结果</small></span>
         </a>
         <a class="workflow-tab" href="#resultsPanel">
           <span class="workflow-index">03</span>
-          <span><strong>Results</strong><small>检查公式、误差、曲线并导出</small></span>
+          <span><strong>Export</strong><small>查看运行状态并导出 JSON / PDF</small></span>
         </a>
       </nav>
 
@@ -78,9 +78,9 @@
           <div class="heading-copy">
             <div class="step">02</div>
             <div>
-              <div class="section-kicker">MODEL CONFIGURATION</div>
-              <h2>定义拟合任务 <span>/ Configure fits</span></h2>
-              <p>每张任务卡对应一条 Y(X) 曲线；横纵轴、单位、数学符号和模型项均可独立设置。</p>
+              <div class="section-kicker">MODEL CONFIGURATION + INLINE OUTPUT</div>
+              <h2>定义并运行拟合任务 <span>/ Configure fits</span></h2>
+              <p>每张任务卡都是独立工作台：左侧配置 X / Y、单位、数学符号和模型项；运行后结果直接出现在右侧。</p>
             </div>
           </div>
           <button class="btn btn-secondary" id="addJobBtn" disabled>＋ 添加任务</button>
@@ -100,9 +100,9 @@
           <div class="heading-copy">
             <div class="step">03</div>
             <div>
-              <div class="section-kicker">FIT OUTPUT</div>
-              <h2>拟合结果 <span>/ Results</span></h2>
-              <p>检查最终公式、系数单位、误差指标、拟合曲线与残差。</p>
+              <div class="section-kicker">STATUS / EXPORT</div>
+              <h2>结果状态与导出 <span>/ Export</span></h2>
+              <p>拟合图和函数已显示在各任务右侧；这里保留运行状态以及 JSON / PDF 导出。</p>
             </div>
           </div>
           <div class="button-row"><button class="btn btn-secondary" id="exportJsonBtn" disabled>导出 JSON</button><button class="btn btn-primary" id="exportPdfBtn" disabled>导出 PDF</button></div>
