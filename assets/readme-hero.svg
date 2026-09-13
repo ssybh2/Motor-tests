@@ -1,0 +1,77 @@
+<svg width="1600" height="480" viewBox="0 0 1600 480" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1600" y2="480" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#08111F"/>
+      <stop offset="0.46" stop-color="#102A43"/>
+      <stop offset="1" stop-color="#21124A"/>
+    </linearGradient>
+    <linearGradient id="neon" x1="280" y1="110" x2="1370" y2="390" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#22D3EE"/>
+      <stop offset="0.52" stop-color="#3B82F6"/>
+      <stop offset="1" stop-color="#A855F7"/>
+    </linearGradient>
+    <radialGradient id="glowC" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(1280 210) rotate(90) scale(250)">
+      <stop stop-color="#22D3EE" stop-opacity="0.28"/>
+      <stop offset="1" stop-color="#22D3EE" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowV" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(1440 350) rotate(90) scale(260)">
+      <stop stop-color="#A855F7" stop-opacity="0.24"/>
+      <stop offset="1" stop-color="#A855F7" stop-opacity="0"/>
+    </radialGradient>
+    <pattern id="grid" width="44" height="44" patternUnits="userSpaceOnUse">
+      <path d="M44 0H0V44" stroke="#93C5FD" stroke-opacity="0.07"/>
+    </pattern>
+    <filter id="softGlow" x="-200%" y="-200%" width="500%" height="500%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <rect width="1600" height="480" rx="32" fill="url(#bg)"/>
+  <rect width="1600" height="480" rx="32" fill="url(#grid)"/>
+  <rect width="1600" height="480" rx="32" fill="url(#glowC)"/>
+  <rect width="1600" height="480" rx="32" fill="url(#glowV)"/>
+
+  <g opacity="0.45">
+    <path d="M0 374C174 356 258 303 397 314C548 327 665 391 819 349C966 309 1086 192 1242 208C1375 221 1482 298 1600 277" stroke="url(#neon)" stroke-width="2.5"/>
+    <path d="M0 399C194 378 298 331 444 344C580 356 693 413 849 371C1023 324 1107 236 1267 244C1381 250 1479 309 1600 300" stroke="url(#neon)" stroke-opacity="0.42" stroke-width="1.3"/>
+  </g>
+
+  <g transform="translate(1195 76)">
+    <circle cx="170" cy="164" r="118" stroke="#67E8F9" stroke-opacity="0.16"/>
+    <circle cx="170" cy="164" r="72" stroke="#A78BFA" stroke-opacity="0.14"/>
+    <circle cx="170" cy="164" r="10" fill="#E0F2FE" filter="url(#softGlow)"/>
+    <g transform="translate(170 164)" fill="url(#neon)" opacity="0.9" filter="url(#softGlow)">
+      <path d="M-5 -8C-49 -87 -55 -139 -26 -150C8 -163 22 -99 10 -18L-5 -8Z"/>
+      <path d="M8 -5C87 -49 139 -55 150 -26C163 8 99 22 18 10L8 -5Z"/>
+      <path d="M5 8C49 87 55 139 26 150C-8 163 -22 99 -10 18L5 8Z"/>
+      <path d="M-8 5C-87 49 -139 55 -150 26C-163 -8 -99 -22 -18 -10L-8 5Z"/>
+    </g>
+    <path d="M25 164H315M170 19V309" stroke="#E0F2FE" stroke-opacity="0.08" stroke-dasharray="4 8"/>
+  </g>
+
+  <g font-family="Inter,Segoe UI,Arial,sans-serif">
+    <text x="86" y="126" fill="#67E8F9" font-size="20" font-weight="700" letter-spacing="4">MOTOR TESTS</text>
+    <text x="82" y="204" fill="#F8FAFC" font-size="62" font-weight="800" letter-spacing="-1.5">UAV Propulsion Fit Lab</text>
+    <text x="86" y="255" fill="#CBD5E1" font-size="24" font-weight="500">Browser-native propulsion identification &amp; curve fitting workspace</text>
+
+    <g transform="translate(86 309)">
+      <rect width="252" height="58" rx="29" fill="url(#neon)" fill-opacity="0.15" stroke="#67E8F9" stroke-opacity="0.35"/>
+      <circle cx="31" cy="29" r="7" fill="#22D3EE"/>
+      <text x="52" y="37" fill="#E2E8F0" font-size="18" font-weight="700">LOCAL PROCESSING</text>
+    </g>
+
+    <g transform="translate(364 309)">
+      <rect width="202" height="58" rx="29" fill="#FFFFFF" fill-opacity="0.055" stroke="#A78BFA" stroke-opacity="0.25"/>
+      <text x="28" y="37" fill="#DDD6FE" font-size="18" font-weight="700">GITHUB PAGES</text>
+    </g>
+  </g>
+
+  <g opacity="0.65">
+    <circle cx="1020" cy="97" r="3" fill="#22D3EE"/>
+    <circle cx="1072" cy="132" r="2" fill="#60A5FA"/>
+    <circle cx="1127" cy="88" r="2.5" fill="#A78BFA"/>
+    <circle cx="1048" cy="186" r="2" fill="#67E8F9"/>
+    <circle cx="1119" cy="217" r="3" fill="#818CF8"/>
+  </g>
+</svg>
