@@ -30,6 +30,9 @@ v2.7 参考 `EcatV2_Master` 的在线 TaskEditor 设计语言，并针对 Window
 - “运行全部拟合”会把每个结果分别放回对应任务的右侧，不再把所有图堆到页面最下面。
 - X/Y 下方的 `Name / Symbol / Unit` 在桌面布局中保持同一行；拟合启用开关放大，便于直接点击。
 - 右侧最终拟合函数会自动缩小到结果面板宽度，不再依赖横向滚动条查看完整表达式。
+- 拟合图重新分配顶部留白：图标题、`Measured / Fit` 图例以及 X/Y 物理量英文标签不再互相叠加；坐标标题增加 standoff 与自动边距。
+- Plotly 拟合曲线使用青色测量点 + 紫色拟合线，并保持残差图、PDF 图与网页一致的清晰工程配色。
+- 整体 UI 新增深蓝渐变顶栏、青色/蓝色/紫色强调线、渐变主按钮、彩色 X/Y 卡片和更轻的面板光影，仅改变视觉表现，不改变拟合、导入、导出和任务交互逻辑。
 - PDF 导出使用新的 **A4 横向工程报告布局**：不再生成一张大面积留白的封面，而是每个拟合任务一页；公式、指标、系数表位于上半页，拟合曲线和残差图以固定字号并排位于下半页，避免旧版 PDF 中公式裁切和 Plotly 坐标文字过大的问题。
 - 页面底部 Results 区域主要用于显示运行状态以及导出 JSON / PDF。
 - X/Y 数据列继续使用可搜索的大字体下拉面板，适合字段较多的 DET 数据。
@@ -46,4 +49,4 @@ v2.7 参考 `EcatV2_Master` 的在线 TaskEditor 设计语言，并针对 Window
 
 Browser-only UAV propulsion fitting tool. Upload ZIP, DET text-based `.xls`, CSV, TSV, or TXT files; configure explicit X/Y axes, units, symbols, and selectable model terms; then export equations, metrics, plots, PDF, and JSON.
 
-The current **UI v2.7** uses a viewport-wide TaskEditor-inspired workspace. Each fit task has configuration on the left and its own equation, metrics, fit plot, and residual plot on the right after execution. The PDF exporter now produces one A4-landscape engineering sheet per fit, with a compact equation/metrics/coefficients section and two consistently sized plots. Uploaded test data is processed locally in the browser.
+The current **UI v2.7** uses a viewport-wide TaskEditor-inspired workspace. Each fit task has configuration on the left and its own equation, metrics, fit plot, and residual plot on the right after execution. Plot titles, legends, and physical-axis labels now use separated spacing with automatic margins, while a cyan/blue/violet engineering theme adds visual depth without changing fitting behavior. The PDF exporter produces one A4-landscape engineering sheet per fit. Uploaded test data is processed locally in the browser.
